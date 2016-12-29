@@ -7,30 +7,42 @@ using namespace std;
 
 Graph::Graph(int x){
 	
+	//w konstruktorze tworzymy: macierz (graph), tablice odwiedzonych wierzcholkow (visited),
+	//tablice do przechowania kolejnosci POST-ORDER (postorder)
+	
 	size = x;
 		
 	graph = new int*[size];
 	for(int i = 0; i < size; i++)
 		graph[i] = new int[size];
-		
+	
+	//zerowanie macierzy
 	zeroGraph();
+	
+	visited = new bool[size];
+	postorder = new int[size];
 	
 }
 
 Graph::~Graph(){
 	
+	//w destruktorze usuwamy wszystkie tablice
+	
 	for (int i = 0; i < size ; i++)
 		delete [] graph[i];
+	
 	delete [] graph;
-	
 	delete [] visited;
-	
 	delete [] postorder;
 }
 
 void Graph::wypisz(){
 	
-	cout<<"  0 1 2 3 4 5"<<endl<<endl;
+	cout<<" ";
+	for(int i = 0; i < size; i++)
+		cout<<" "<<i;
+	cout<<endl;
+	
 	for(int i = 0; i < size; i++){
 		cout<<i<<" ";
 		for(int j = 0; j < size; j++){
@@ -54,29 +66,10 @@ void Graph::fillTheMatrix(){
 	ifstream ifile;
 	ifile.open("data.txt");
 	int a, b;
-	while(ifile >> a >> b){
+	while(ifile >> a >> b)
 		graph[a][b] = 1;
-		//graph[b][a] = 1;
-	}
+	
 	ifile.close();
-}
-
-void showVisited(bool *tab, int n){
-	
-	cout<<"visited: "<<endl;
-	for(int i = 0; i < n; i++){
-		cout<<i<<". ";
-		if(tab[i]) cout<<"TRUE"<<endl;
-		else cout<<"FALSE"<<endl;
-	}
-	
-}
-void showPostOrder(int n, int *po){
-	
-	for(int i = 0; i < n; i++)
-		cout<<po[i]<<" ";
-	cout<<endl;
-	
 }
 
 int Graph::znajdzSasiada(int w){
@@ -87,13 +80,13 @@ int Graph::znajdzSasiada(int w){
 	//warunki to: komorka tablica nie moze miec 0 (tam gdzie jest krawedz jest 1) - czyli jak komorka ma 1ke
 	//wierzcholek nie moze byc wczesniej odwiedzony
 	//zawsze wybiera pierwzego spotkanego sasiada ktory spelnia dwa powyzsze warunki. Najmniejszego wzrostowo
-	for(int i = 0; i < size; i++){
+	for(int i = 0; i < size; i++)
 		if(graph[w][i] != 0 && !visited[i] && l < 1){
 			l++;
 			//przypisuje do parametru w nowego sasiada
 			w = i;
 		}
-	}
+	
 	//i zwraca go
 	return w;
 }
@@ -146,10 +139,7 @@ void Graph::transposeMatrix(){
 
 void Graph::DFSPostOrder(int beg){
 	
-	visited = new bool[size];
 	for(int i = 0; i < size; i++) visited[i] = false;
-	
-	postorder = new int[size];
 	for(int i = 0; i < size; i++) postorder[i] = 0;
 	
 	int k = 0;
@@ -186,7 +176,6 @@ void Graph::DFSPostOrder(int beg){
 void Graph::KosarajuAlgorithm(){
 	
 	//ten algorytm ma wykonywac na transponowanym grafie DFS-y. po kolei od konca tablicy POST-ORDER
-	
 	transposeMatrix();
 	
 	//tablica pomocnicza to przechowywania ustalonego wczesniej przez algorytm DFS POST ORDER porzadku.
